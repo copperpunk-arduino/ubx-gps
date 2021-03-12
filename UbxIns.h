@@ -1,6 +1,6 @@
 #include "UBX_Parser.h"
 
-class UBX_Ins : public UBX_Parser
+class UbxIns : public UbxParser
 {
 public:
     void ProcessMessage();

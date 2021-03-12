@@ -1,6 +1,6 @@
-#include "UBX_Ins.h"
+#include "UbxIns.h"
 
-void UBX_Ins::ProcessMessage()
+void UbxIns::ProcessMessage()
 {
     switch (msgid_)
     {
@@ -69,59 +69,59 @@ void UBX_Ins::ProcessMessage()
     }
 }
 
-unsigned long UBX_Ins::iTOW() { return iTOW_; }
-double UBX_Ins::TimeFix()
+unsigned long UbxIns::iTOW() { return iTOW_; }
+double UbxIns::TimeFix()
 {
     unsigned long itow_sec = (unsigned long)(iTOW_ * (1e-3));
     // // g fix_us = time_ns_ * (1e-3);
     return (double(itow_sec) + (double)time_ns_ * (1e-9));
 }
-unsigned long UBX_Ins::Nano()
+unsigned long UbxIns::Nano()
 {
     return time_ns_;
 }
-unsigned char UBX_Ins::FixType() { return fix_type_; }
-long UBX_Ins::Latitude() { return latitude_; }
-long UBX_Ins::Longitude() { return longitude_; }
-long UBX_Ins::Height() { return height_; }
-long UBX_Ins::HMsl() { return hMSL_; }
-long UBX_Ins::VNorth() { return v_north_; }
-long UBX_Ins::VEast() { return v_east_; }
-long UBX_Ins::VDown() { return v_down_; }
-bool UBX_Ins::IsNewFix() { return new_fix_; }
-void UBX_Ins::ClearFix() { new_fix_ = false; }
-long UBX_Ins::Dt() { return end_time_ - start_byte_time_; }
+unsigned char UbxIns::FixType() { return fix_type_; }
+long UbxIns::Latitude() { return latitude_; }
+long UbxIns::Longitude() { return longitude_; }
+long UbxIns::Height() { return height_; }
+long UbxIns::HMsl() { return hMSL_; }
+long UbxIns::VNorth() { return v_north_; }
+long UbxIns::VEast() { return v_east_; }
+long UbxIns::VDown() { return v_down_; }
+bool UbxIns::IsNewFix() { return new_fix_; }
+void UbxIns::ClearFix() { new_fix_ = false; }
+long UbxIns::Dt() { return end_time_ - start_byte_time_; }
 
 // IMU getters
-double UBX_Ins::TimeFixImu()
+double UbxIns::TimeFixImu()
 {
     unsigned long itow_sec = (unsigned long)(iTOW_imu_ * (1e-3));
     // long fix_us = time_ns_imu_ * (1e-3);
     return (double(itow_sec) + double(time_ns_imu_) * (1e-9));
 }
 
-void UBX_Ins::Accel(float data[])
+void UbxIns::Accel(float data[])
 {
     data[0] = accel_[0];
     data[1] = accel_[1];
     data[2] = accel_[2];
 }
 
-void UBX_Ins::Gyro(float data[])
+void UbxIns::Gyro(float data[])
 {
     data[0] = gyro_[0];
     data[1] = gyro_[1];
     data[2] = gyro_[2];
 }
-bool UBX_Ins::IsNewImu() { return new_imu_; }
-void UBX_Ins::ClearImu() { new_imu_ = false; }
+bool UbxIns::IsNewImu() { return new_imu_; }
+void UbxIns::ClearImu() { new_imu_ = false; }
 
 // Rel Pos getters
-double UBX_Ins::TimeFixRelPos()
+double UbxIns::TimeFixRelPos()
 {
     return (double(iTOW_rel_) * (1e-3));
 }
 
-float UBX_Ins::RelHeading() { return rel_heading_; }
-bool UBX_Ins::IsNewRelPos() { return new_rel_pos_; }
-void UBX_Ins::ClearRelPos() { new_rel_pos_ = false; }
+float UbxIns::RelHeading() { return rel_heading_; }
+bool UbxIns::IsNewRelPos() { return new_rel_pos_; }
+void UbxIns::ClearRelPos() { new_rel_pos_ = false; }
