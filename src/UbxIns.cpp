@@ -22,6 +22,7 @@ void UbxIns::processMessage()
         {
         case 0x02:
         {
+            // NAV-POSLLH
             iTOW_ = unpackUint32(0);
             longitude_ = unpackInt32(4);
             latitude_ = unpackInt32(8);
@@ -29,11 +30,12 @@ void UbxIns::processMessage()
             hMSL_ = unpackInt32(16);
             h_acc_ = unpackInt32(20);
             v_acc_ = unpackInt32(24);
+            new_fix_ = true;
             break;
         }
         case 0x07:
         {
-            // debug_port.println("NAV-PVT");
+            // NAV-PVT
             iTOW_ = unpackUint32(0);
             year_ = unpackUint16(4);
             month_ = unpackUint8(6);
@@ -53,13 +55,12 @@ void UbxIns::processMessage()
             v_east_ = unpackInt32(52);
             v_down_ = unpackInt32(56);
             new_fix_ = true;
-            // debug_port.println("itow nav: " + String(iTOW_*(1e-3),1));
             break;
         }
 
         case 0x3C:
         {
-            // debug_port.println("REL");
+            // NAV-RELPOLNED
             iTOW_rel_ = unpackUint32(4);
             int32_t relPosLength_cm = unpackInt32(20);
             int32_t relPosHeading_deg_em5 = unpackInt32(24);
@@ -68,9 +69,6 @@ void UbxIns::processMessage()
             uint32_t accHeading_deg_em5 = unpackUint32(52);
             uint32_t flags = unpackUint32(60);
             int32_t rel_pos_length_mm_em1 = relPosLength_cm * 100 + relPosHPLength_mm_em1;
-            // debug_port.println("len: " + String(rel_pos_length_mm_em1));
-            // debug_port.println("flags: " + String(flags,BIN));
-            // debug_port.println("accL/accH: " + String(accLength_mm_em1*(1e-4),3) + "/" + String(accHeading_deg_em5*(1e-5),2));
             // Flags expected at bits 0,2,8 => 261
             if ((flags & 261 == 261) && (abs(rel_pos_length_mm_em1 - rel_pos_sep_exp_mm_em1_) < rel_pos_acc_thresh_mm_em1_))
             {
@@ -91,7 +89,6 @@ uint32_t UbxIns::iTOW() { return iTOW_; }
 double UbxIns::timeFix()
 {
     uint32_t itow_sec = (uint32_t)(iTOW_ * (1e-3));
-    // // g fix_us = time_ns_ * (1e-3);
     return (double(itow_sec) + (double)time_ns_ * (1e-9));
 }
 uint32_t UbxIns::nano()
@@ -116,7 +113,6 @@ int32_t UbxIns::dt() { return end_time_ - start_byte_time_; }
 double UbxIns::timeFixImu()
 {
     uint32_t itow_sec = (uint32_t)(iTOW_imu_ * (1e-3));
-    // int32_t fix_us = time_ns_imu_ * (1e-3);
     return (double(itow_sec) + double(time_ns_imu_) * (1e-9));
 }
 
@@ -136,7 +132,6 @@ void UbxIns::gyro(float data[])
 bool UbxIns::isNewImu() { return new_imu_; }
 void UbxIns::clearImu() { new_imu_ = false; }
 
-// Rel Pos getters
 double UbxIns::timeFixRelPos()
 {
     return (double(iTOW_rel_) * (1e-3));
