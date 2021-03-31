@@ -1,4 +1,5 @@
 #include "UbxParser.h"
+#include <cstdlib>
 
 class UbxIns : public UbxParser
 {

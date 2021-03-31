@@ -33,40 +33,46 @@ void loop()
     debug_port.print(F("\nwrite message\n"));
     data_port.write(kTestMessage, kMessageLength);
     data_port.flush();
-    if (ins_.read(&data_port))
+    while (data_port.available())
     {
-        debug_port.print("Message rx'd with class ");
-        debug_port.print(ins_.msgClass());
-        debug_port.print(F(" and ID "));
-        debug_port.print(ins_.msgId());
-        if ((ins_.msgClass() == 0x01) && (ins_.msgId() == 0x02))
+        if (ins_.parse(data_port.read()))
         {
-            // Expected values are as follows (see U-blox Interface Description
-            // for appropriate scaling and units):
-            // iTOW: 143773669 [ms]
-            // Latitude: 45.00 [deg]
-            // Longitude: -122.00 [deg]
-            // Height above ellipsoid: 123000 [mm]
-            // Height above MSL: 456000 [mm]
-            // hAcc: 1020 [mm]
-            // vAcc: 2040 [mm]
-            ins_.processMessage();
-            debug_port.print(F("\niTOW: "));
-            debug_port.print(ins_.iTOW());
-            debug_port.print(F("\nlatitude: "));
-            debug_port.print(ins_.latitude()*1e-7);
-            debug_port.print(F("\nlongitude: "));
-            debug_port.print(ins_.longitude()*1e-7);
-            debug_port.print(F("\nheight above ellipsoid: "));
-            debug_port.print(ins_.height());
-            debug_port.print(F("\nheight above MSL: "));
-            debug_port.print(ins_.hMsl());
-            debug_port.print(F("\nhAcc: "));
-            debug_port.print(ins_.hAcc());
-            debug_port.print(F("\nvAcc: "));
-            debug_port.print(ins_.vAcc());
+            debug_port.print("Message rx'd with class ");
+            debug_port.print(ins_.msgClass());
+            debug_port.print(F(" and ID "));
+            debug_port.print(ins_.msgId());
+            debug_port.print(F("\nTime: "));
+            debug_port.print(millis() * 1e-3, 3);
+
+            if ((ins_.msgClass() == 0x01) && (ins_.msgId() == 0x02))
+            {
+                // Expected values are as follows (see U-blox Interface Description
+                // for appropriate scaling and units):
+                // iTOW: 143773669 [ms]
+                // Latitude: 45.00 [deg]
+                // Longitude: -122.00 [deg]
+                // Height above ellipsoid: 123000 [mm]
+                // Height above MSL: 456000 [mm]
+                // hAcc: 1020 [mm]
+                // vAcc: 2040 [mm]
+                ins_.processMessage();
+                debug_port.print(F("\niTOW: "));
+                debug_port.print(ins_.iTOW());
+                debug_port.print(F("\nlatitude: "));
+                debug_port.print(ins_.latitude() * 1e-7);
+                debug_port.print(F("\nlongitude: "));
+                debug_port.print(ins_.longitude() * 1e-7);
+                debug_port.print(F("\nheight above ellipsoid: "));
+                debug_port.print(ins_.height());
+                debug_port.print(F("\nheight above MSL: "));
+                debug_port.print(ins_.hMsl());
+                debug_port.print(F("\nhAcc: "));
+                debug_port.print(ins_.hAcc());
+                debug_port.print(F("\nvAcc: "));
+                debug_port.print(ins_.vAcc());
+            }
+            debug_port.print(F("\n\n"));
         }
-        debug_port.print(F("\n\n"));
     }
     delay(1000);
 }
