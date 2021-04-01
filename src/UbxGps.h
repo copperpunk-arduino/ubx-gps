@@ -5,7 +5,7 @@ class UbxGps : public UbxParser
 {
 public:
     UbxGps();
-    UbxGps(uint32_t antenna_separation_mm, uint32_t relative_position_accuracy_threshold_mm);
+    // UbxGps(uint32_t antenna_separation_mm, uint32_t relative_position_accuracy_threshold_mm);
     void processMessage();
     uint32_t iTowMs();
     double timeFixSec();
@@ -25,6 +25,7 @@ public:
 
     double timeFixRelHdgSec();
     float relHeadingDeg();
+    float relPositionDistanceMm();
     bool isNewRelHdg();
     void clearRelHdg();
 
@@ -58,6 +59,7 @@ private:
     uint32_t rel_pos_sep_exp_mm_em1_; //[millimeters * 1e-1]
     uint32_t rel_pos_acc_thresh_mm_em1_; //[millimeters * 1e-1]
     uint32_t itow_rel_ms_;
-    float rel_heading_deg_ = 0.0F;
+    float rel_pos_distance_mm_ = 0.f;
+    float rel_heading_deg_ = 0.f;
     bool new_rel_hdg_ = false;
 };

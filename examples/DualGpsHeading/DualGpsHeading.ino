@@ -19,7 +19,7 @@
 const float kDeg2Rad = 0.017453293f;
 
 // GPS Definitions
-UbxGps gps_(18225, 100); // This parses received characters
+UbxGps gps_; // This parses received characters
 const long kGpsBaud = 115200;
 double gps_latitude_deg_;
 double gps_longitude_deg_;
@@ -30,21 +30,20 @@ double gps_fix_time_prev_sec_ = 0.;
 uint8_t gps_status_ = 0;
 
 // Heading Definitions
+const float kExpectedRelPositionDistanceMm = 1822.5f;
+const float kRelPositionAccMm = 200.f;
 double rel_hdg_time_sec_;
 double rel_hdg_time_prev_sec_ = 0.;
 float rel_hdg_deg_ = 0.F;
 
 void setup()
 {
-    //------------- Debug Port Setup BEGIN -----------------
 #ifdef DEBUG
     debug_port.begin(115200);
     while (!debug_port)
     {
     }
 #endif
-    //------------- Debug Port Setup END -----------------
-    //------------- GPS Setup BEGIN -----------------
     DebugPrint(F("Gps Setup..."));
     gps_port.begin(kGpsBaud);
     gps_port.setTimeout(1);
@@ -58,22 +57,32 @@ void loop()
 {
     while (gps_.read(&gps_port))
     {
+        gps_.processMessage();
     }
     if (gps_.isNewFix())
     {
+        gps_.clearFix();
         updateGpsFix();
         printPosition();
+        printVelocity();
     }
     if (gps_.isNewRelHdg())
     {
-        updateRelativeHeading();
+        gps_.clearRelHdg();
+        if (abs(gps_.relPositionDistanceMm() - kExpectedRelPositionDistanceMm) < kRelPositionAccMm)
+        {
+            updateRelativeHeading();
+        }
+        else
+        {
+            DebugPrintln("antenna relative dist[mm] out of range: " + String(gps_.relPositionDistanceMm()));
+        }
         printRelativeHeading();
     }
 }
 
 void updateGpsFix()
 {
-    gps_.clearFix();
     gps_status_ = gps_.fixType();
     gps_fix_time_sec_ = gps_.timeFixSec();
     float dt = (gps_fix_time_sec_ - gps_fix_time_prev_sec_);
@@ -94,7 +103,6 @@ void updateGpsFix()
 
 void updateRelativeHeading()
 {
-    gps_.clearRelHdg();
     rel_hdg_time_sec_ = gps_.timeFixRelHdgSec();
     float dt = (rel_hdg_time_sec_ - rel_hdg_time_prev_sec_);
     if (dt > 0)
@@ -106,15 +114,15 @@ void updateRelativeHeading()
 
 void printPosition()
 {
-  DebugPrintln("lat[deg]/lon[deg]/hgt[m]: " + String(gps_latitude_deg_, 7) + "/" + String(gps_longitude_deg_, 7) + "/" + String(gps_height_m_, 2));
+    DebugPrintln("lat[deg]/lon[deg]/hgt[m]: " + String(gps_latitude_deg_, 7) + "/" + String(gps_longitude_deg_, 7) + "/" + String(gps_height_m_, 2));
 }
 
 void printVelocity()
 {
-  DebugPrintln("vel[mps] X/Y/Z: " + String(gps_velocity_mps_[0], 2) + "/" + String(gps_velocity_mps_[1], 2) + "/"  + String(gps_velocity_mps_[2], 2));
+    DebugPrintln("vel[mps] X/Y/Z: " + String(gps_velocity_mps_[0], 2) + "/" + String(gps_velocity_mps_[1], 2) + "/" + String(gps_velocity_mps_[2], 2));
 }
 
 void printRelativeHeading()
 {
-    DebugPrintln("Rel Hdg[deg]: " + String(rel_hdg_deg_,1));
+    DebugPrintln("Rel Hdg[deg]: " + String(rel_hdg_deg_, 1));
 }

@@ -7,11 +7,11 @@ UbxGps::UbxGps()
     rel_pos_sep_exp_mm_em1_ = 0;
 }
 
-UbxGps::UbxGps(uint32_t antenna_separation_mm, uint32_t relative_position_accuracy_threshold_mm)
-{
-    rel_pos_sep_exp_mm_em1_ = antenna_separation_mm * 10;
-    rel_pos_acc_thresh_mm_em1_ = relative_position_accuracy_threshold_mm * 10;
-}
+// UbxGps::UbxGps(uint32_t antenna_separation_mm, uint32_t relative_position_accuracy_threshold_mm)
+// {
+//     rel_pos_sep_exp_mm_em1_ = antenna_separation_mm * 10;
+//     rel_pos_acc_thresh_mm_em1_ = relative_position_accuracy_threshold_mm * 10;
+// }
 
 void UbxGps::processMessage()
 {
@@ -63,13 +63,13 @@ void UbxGps::processMessage()
         {
             // NAV-RELPOLNED
             itow_rel_ms_ = unpackUint32(4);
-            int32_t relPosLength_cm = unpackInt32(20);
+            int32_t relPosDistance_cm = unpackInt32(20);
             int32_t relHeading_deg_em5 = unpackInt32(24);
-            int8_t relPosHPLength_mm_em1 = unpackInt8(25);
+            int8_t relPosHpDistance_mm_em1 = unpackInt8(25);
             uint32_t flags = unpackUint32(60);
-            int32_t rel_pos_length_mm_em1 = relPosLength_cm * 100 + relPosHPLength_mm_em1;
+            rel_pos_distance_mm_ = relPosDistance_cm * 10 + relPosHpDistance_mm_em1 * 0.1f;
             // Flags expected at bits 0,2,8 => 261
-            if ((flags & 261 == 261) && (abs(rel_pos_length_mm_em1 - rel_pos_sep_exp_mm_em1_) < rel_pos_acc_thresh_mm_em1_))
+            if (flags & 261 == 261) // && (abs(rel_pos_length_mm_em1 - rel_pos_sep_exp_mm_em1_) < rel_pos_acc_thresh_mm_em1_))
             {
                 rel_heading_deg_ = relHeading_deg_em5 * (1e-5);
                 new_rel_hdg_ = true;
@@ -113,5 +113,6 @@ double UbxGps::timeFixRelHdgSec()
 }
 // NAV-RELPOSNED
 float UbxGps::relHeadingDeg() { return rel_heading_deg_; }
+float UbxGps::relPositionDistanceMm() { return rel_pos_distance_mm_; }
 bool UbxGps::isNewRelHdg() { return new_rel_hdg_; }
 void UbxGps::clearRelHdg() { new_rel_hdg_ = false; }
