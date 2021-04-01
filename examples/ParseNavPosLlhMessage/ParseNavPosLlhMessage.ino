@@ -26,6 +26,12 @@ void setup()
     while (!data_port)
     {
     }
+    float accel[3];
+    float gyro[3];
+    ins_.accel(accel);
+    ins_.gyro(gyro);
+    debug_port.println("accel: " + String(accel[0]) + "/" + String(accel[1]) + "/" + String(accel[2]));
+    debug_port.println("gyro: " + String(gyro[0]) + "/" + String(gyro[1]) + "/" + String(gyro[2]));
 }
 
 void loop()
@@ -35,7 +41,7 @@ void loop()
     data_port.flush();
     while (data_port.available())
     {
-        if (ins_.parse(data_port.read()))
+        if (ins_.read(&data_port))
         {
             debug_port.print("Message rx'd with class ");
             debug_port.print(ins_.msgClass());
@@ -43,7 +49,7 @@ void loop()
             debug_port.print(ins_.msgId());
             debug_port.print(F("\nTime: "));
             debug_port.print(millis() * 1e-3, 3);
-
+            ins_.processMessage();
             if ((ins_.msgClass() == 0x01) && (ins_.msgId() == 0x02))
             {
                 // Expected values are as follows (see U-blox Interface Description
@@ -55,7 +61,6 @@ void loop()
                 // Height above MSL: 456000 [mm]
                 // hAcc: 1020 [mm]
                 // vAcc: 2040 [mm]
-                ins_.processMessage();
                 debug_port.print(F("\niTOW: "));
                 debug_port.print(ins_.iTOW());
                 debug_port.print(F("\nlatitude: "));
@@ -70,6 +75,7 @@ void loop()
                 debug_port.print(ins_.hAcc());
                 debug_port.print(F("\nvAcc: "));
                 debug_port.print(ins_.vAcc());
+                ins_.clearFix();
             }
             debug_port.print(F("\n\n"));
         }

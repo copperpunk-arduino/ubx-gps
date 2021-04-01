@@ -1,2 +1,4 @@
-UbxIns  KEYWORD1
-processMessage KEYWORD2
+UbxGps  KEYWORD1
+processMessage  KEYWORD2
+clearFix    KEYWORD2
+clearRelPos KEYWORD2
