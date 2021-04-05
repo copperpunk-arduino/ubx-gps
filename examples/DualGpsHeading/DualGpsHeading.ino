@@ -48,16 +48,15 @@ void setup()
     gps_port.begin(kGpsBaud);
     gps_port.setTimeout(1);
     // Clear GPS buffer
-    while (gps_.read(&gps_port))
-        ;
+    while (gps_.checkForMessage(&gps_port))
+    {}
     DebugPrintln(F("Done!"));
 }
 
 void loop()
 {
-    while (gps_.read(&gps_port))
+    while (gps_.checkForMessage(&gps_port))
     {
-        gps_.processMessage();
     }
     if (gps_.isNewFix())
     {
