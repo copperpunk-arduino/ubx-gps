@@ -1,7 +1,7 @@
 #include "UbxGps.h"
 
 /*
-    This sketch sends the same U-blox NAV-POSLLH message once per second.
+    This sketch sends a U-blox NAV-POSLLH message once per second.
     An example of the message definition can be found in the ZED-F9P Interface Description:
     https://www.u-blox.com/sites/default/files/ZED-F9P_InterfaceDescription_%28UBX-18010854%29.pdf
 
@@ -10,9 +10,6 @@
 
 #define debug_port Serial
 #define data_port Serial1
-
-// const int kMessageLength = 36;
-// uint8_t kTestMessage[] = {181, 98, 1, 2, 28, 0, 229, 207, 145, 8, 0, 71, 72, 183, 128, 116, 210, 26, 120, 224, 1, 0, 64, 245, 6, 0, 252, 3, 0, 0, 248, 7, 0, 0, 36, 18};
 
 long system_time_prev_ms_;
 
@@ -39,7 +36,7 @@ void setup()
     while (!data_port)
     {
     }
-system_time_prev_ms_ = millis();
+    system_time_prev_ms_ = millis();
 }
 
 void loop()
@@ -48,7 +45,7 @@ void loop()
     long current_time = millis();
     itow_ += (current_time - system_time_prev_ms_);
     system_time_prev_ms_ = current_time;
-    
+
     // Build Message
     gps_.buildNavPosLlhMessage(itow_, latitude_deg_, lontidue_deg_, height_mm_, h_msl_mm_, h_acc_mm_, v_acc_mm_);
 
@@ -60,37 +57,34 @@ void loop()
     gps_.writeMessageInTxBuffer(&data_port);
     data_port.flush();
 
-    // Check for new data
-    while (data_port.available())
+    // Check for new messages
+    while (gps_.checkForMessage(&data_port))
     {
-        if (gps_.checkForMessage(&data_port))
-        {
-            debug_port.print("Message rx'd with class ");
-            debug_port.print(gps_.msgClass());
-            debug_port.print(F(" and ID "));
-            debug_port.print(gps_.msgId());
-            // gps_.processMessage();
-            if ((gps_.msgClass() == 0x01) && (gps_.msgId() == 0x02))
-            {
-                // See earlier value definitions for expected results
-                debug_port.print(F("\niTOW: "));
-                debug_port.print(gps_.iTowMs());
-                debug_port.print(F("\nlatitude: "));
-                debug_port.print(gps_.latitudeDeg() * 1e-7);
-                debug_port.print(F("\nlongitude: "));
-                debug_port.print(gps_.longitudeDeg() * 1e-7);
-                debug_port.print(F("\nheight above ellipsoid: "));
-                debug_port.print(gps_.heightMm());
-                debug_port.print(F("\nheight above MSL: "));
-                debug_port.print(gps_.hMslMm());
-                debug_port.print(F("\nhAcc: "));
-                debug_port.print(gps_.hAccMm());
-                debug_port.print(F("\nvAcc: "));
-                debug_port.print(gps_.vAccMm());
-                gps_.clearFix();
-            }
-            debug_port.print(F("\n\n"));
-        }
+    }
+    if (gps_.isNewFix())
+    {
+        gps_.clearFix();
+        debug_port.print("Message rx'd with class ");
+        debug_port.print(gps_.msgClass());
+        debug_port.print(F(" and ID "));
+        debug_port.print(gps_.msgId());
+
+        // See earlier value definitions for expected results
+        debug_port.print(F("\niTOW: "));
+        debug_port.print(gps_.iTowMs());
+        debug_port.print(F("\nlatitude: "));
+        debug_port.print(gps_.latitudeDeg() * 1e-7);
+        debug_port.print(F("\nlongitude: "));
+        debug_port.print(gps_.longitudeDeg() * 1e-7);
+        debug_port.print(F("\nheight above ellipsoid: "));
+        debug_port.print(gps_.heightMm());
+        debug_port.print(F("\nheight above MSL: "));
+        debug_port.print(gps_.hMslMm());
+        debug_port.print(F("\nhAcc: "));
+        debug_port.print(gps_.hAccMm());
+        debug_port.print(F("\nvAcc: "));
+        debug_port.print(gps_.vAccMm());
+        debug_port.print(F("\n\n"));
     }
     latitude_deg_ += 0.1;
     lontidue_deg_ -= 0.05;

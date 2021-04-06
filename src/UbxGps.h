@@ -36,6 +36,7 @@ public:
     float relPositionDistanceMm();
     bool isNewRelHdg();
     void clearRelHdg();
+    bool isRelPositionDistanceWithinThreshold(float expected_distance_mm, float accuracy_threshold_mm);
 
     // NAV-POSLLH
     void buildNavPosLlhMessage(uint32_t itow_ms, float latitude_deg, float longitude_deg, int32_t height_mm, int32_t h_msl_mm, uint32_t h_acc_mm, uint32_t v_acc_mm);

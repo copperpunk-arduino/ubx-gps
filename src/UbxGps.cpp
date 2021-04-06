@@ -7,12 +7,6 @@ UbxGps::UbxGps()
     rel_pos_sep_exp_mm_em1_ = 0;
 }
 
-// UbxGps::UbxGps(uint32_t antenna_separation_mm, uint32_t relative_position_accuracy_threshold_mm)
-// {
-//     rel_pos_sep_exp_mm_em1_ = antenna_separation_mm * 10;
-//     rel_pos_acc_thresh_mm_em1_ = relative_position_accuracy_threshold_mm * 10;
-// }
-
 bool UbxGps::checkForMessage(Stream *port)
 {
     if (ubx_.read(port))
@@ -133,6 +127,10 @@ float UbxGps::relPositionDistanceMm() { return rel_pos_distance_mm_; }
 bool UbxGps::isNewRelHdg() { return new_rel_hdg_; }
 void UbxGps::clearRelHdg() { new_rel_hdg_ = false; }
 
+bool UbxGps::isRelPositionDistanceWithinThreshold(float expected_distance_mm, float accuracy_threshold_mm)
+{
+    return (abs(expected_distance_mm - rel_pos_distance_mm_) < accuracy_threshold_mm);
+}
 void UbxGps::buildNavPosLlhMessage(uint32_t itow_ms, float latitude_deg, float longitude_deg, int32_t height_mm, int32_t h_msl_mm, uint32_t h_acc_mm, uint32_t v_acc_mm)
 {
     ubx_.setHeaderValues(0x01, 0x02, 28);
