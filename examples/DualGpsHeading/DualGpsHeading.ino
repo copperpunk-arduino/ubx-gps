@@ -1,6 +1,6 @@
 #include "UbxGps.h"
 
-#define debug_port SerialUSB
+#define debug_port Serial
 #define gps_port Serial1
 
 #define DEBUG
