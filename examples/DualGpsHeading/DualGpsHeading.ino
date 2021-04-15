@@ -68,7 +68,7 @@ void loop()
     if (gps_.isNewRelHdg())
     {
         gps_.clearRelHdg();
-        if (abs(gps_.relPositionDistanceMm() - kExpectedRelPositionDistanceMm) < kRelPositionAccMm)
+        if (gps_.isRelPositionDistanceWithinThreshold(kExpectedRelPositionDistanceMm, kRelPositionAccMm))
         {
             updateRelativeHeading();
         }
