@@ -71,7 +71,7 @@ void UbxGps::processMessage()
             itow_rel_ms_ = ubx_.unpackUint32(4);
             int32_t relPosDistance_cm = ubx_.unpackInt32(20);
             int32_t relHeading_deg_em5 = ubx_.unpackInt32(24);
-            int8_t relPosHpDistance_mm_em1 = ubx_.unpackInt8(25);
+            int8_t relPosHpDistance_mm_em1 = ubx_.unpackInt8(35);
             uint32_t flags = ubx_.unpackUint32(60);
             rel_pos_distance_mm_ = relPosDistance_cm * 10 + relPosHpDistance_mm_em1 * 0.1f;
             // Flags expected at bits 0,2,8 => 261
